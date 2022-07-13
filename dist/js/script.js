@@ -35,6 +35,49 @@ window.addEventListener('DOMContentLoaded', () => {
     tabs[i].classList.add('show', 'fade');
     tabs[i].classList.remove('hide');
     itemsTab[i].classList.add('tabheader__item_active');
+  } //Timer
+
+
+  const stampEnd = new Date(2022, 6, 25);
+  getRemain();
+
+  function getRemain() {
+    const stampNow = new Date();
+    const diff = stampEnd.getTime() - stampNow.getTime();
+    const seconds = Math.floor(diff / 1000 % 60);
+    const minutes = Math.floor(diff / 1000 / 60 % 60);
+    const days = Math.floor(diff / 1000 / 60 / 60 / 24);
+    const hours = Math.floor(diff / 1000 / 60 / 60 % 24);
+    diff <= 0 ? drawTime(0, 0, 0, 0) : drawTime(days, hours, minutes, seconds);
+    const timeout = setTimeout(() => {
+      if (diff > 0) {
+        setTimeout(getRemain, 4);
+      } else {
+        clearTimeout(timeout);
+        drawTime(0, 0, 0, 0);
+      }
+    }, 1000);
+  }
+
+  function drawTime(days, hours, minutes, seconds) {
+    const daysBlock = document.querySelector('#days');
+    const hoursBlock = document.querySelector('#hours');
+    const minutesBlock = document.querySelector('#minutes');
+    const secondsBlock = document.querySelector('#seconds');
+    daysBlock.textContent = stringifyNumber(days);
+    hoursBlock.textContent = stringifyNumber(hours);
+    minutesBlock.textContent = stringifyNumber(minutes);
+    secondsBlock.textContent = stringifyNumber(seconds);
+  }
+
+  function stringifyNumber(number) {
+    let str = number.toString();
+
+    if (str.length < 2) {
+      str = `0${str}`;
+    }
+
+    return str;
   }
 });
 /******/ })()
