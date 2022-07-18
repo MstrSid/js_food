@@ -131,10 +131,60 @@ window.addEventListener('DOMContentLoaded', () => {
 	const modalTimerId = setTimeout(openModal, 30000, modal);
 
 	window.addEventListener('scroll', () => {
-		if (window.scrollY + document.documentElement.clientHeight >= document.documentElement.scrollHeight-1 && !isShowed) {
+		if (window.scrollY + document.documentElement.clientHeight >= document.documentElement.scrollHeight - 1 && !isShowed) {
 			openModal(modal);
 		}
 	});
+
+
+	// menu cards
+	class CardItem {
+		constructor(parentSelector, containerSelector, classItemSelector, img, alt, subtitle, descr, moneyTotal) {
+			this.parentSelector = parentSelector;
+			this.containerSelector = containerSelector;
+			this.classItemSelector = classItemSelector;
+			this.img = img;
+			this.alt = alt;
+			this.subtitle = subtitle;
+			this.descr = descr;
+			this.moneyTotal = moneyTotal;
+		}
+
+		render() {
+			const parent = document.querySelector(this.parentSelector);
+			const container = parent.querySelector(this.containerSelector);
+			const div = document.createElement('div');
+			div.classList.add(this.classItemSelector);
+			div.innerHTML = `
+			 		<img src="img/tabs/${this.img}" alt=${this.alt}>
+                    <h3 class="menu__item-subtitle">${this.subtitle}</h3>
+                    <div class="menu__item-descr">${this.descr}</div>
+                    <div class="menu__item-divider"></div>
+                    <div class="menu__item-price">
+                        <div class="menu__item-cost">Цена:</div>
+                        <div class="menu__item-total"><span>${this.moneyTotal}</span> грн/день</div>
+                    </div>`;
+			container.append(div);
+
+		}
+	}
+
+	const cardOne = new CardItem('.menu__field', '.container', 'menu__item',
+		'vegy.jpg', 'vegy', 'Меню "Фитнес"',
+		'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+		229);
+	const cardTwo = new CardItem('.menu__field', '.container', 'menu__item',
+		'elite.jpg', 'elite', 'Меню "Премиум"',
+		'В меню "Премиум" мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+		550);
+	const cardTree = new CardItem('.menu__field', '.container', 'menu__item',
+		'post.jpg', 'post', 'Меню "Постное"',
+		'еню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+		430);
+
+	cardOne.render();
+	cardTwo.render();
+	cardTree.render();
 
 });
 
