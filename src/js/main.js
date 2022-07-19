@@ -117,7 +117,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	});
 
 	modal.addEventListener('click', (e) => {
-		if (e.target) {
+		if (e.target === modal) {
 			closeModal(modal);
 		}
 	});
@@ -169,23 +169,71 @@ window.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
-	const cardOne = new CardItem('.menu__field', '.container', 'menu__item',
+	new CardItem('.menu__field', '.container', 'menu__item',
 		'vegy.jpg', 'vegy', 'Меню "Фитнес"',
 		'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-		229);
-	const cardTwo = new CardItem('.menu__field', '.container', 'menu__item',
+		229).render();
+	new CardItem('.menu__field', '.container', 'menu__item',
 		'elite.jpg', 'elite', 'Меню "Премиум"',
 		'В меню "Премиум" мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-		550);
-	const cardTree = new CardItem('.menu__field', '.container', 'menu__item',
+		550).render();
+	new CardItem('.menu__field', '.container', 'menu__item',
 		'post.jpg', 'post', 'Меню "Постное"',
-		'еню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-		430);
+		'Меню "Постное" - это тщательный подбор ингредиентов: полное' +
+		' отсутствие продуктов животного происхождения, молоко из миндаля,' +
+		' овса, кокоса или гречки, правильное количество белков за счет тофу' +
+		' и импортных вегетарианских стейков.',
+		430).render();
 
-	cardOne.render();
-	cardTwo.render();
-	cardTree.render();
+	// Forms
 
+	const forms = document.querySelectorAll('form');
+
+	const message = {
+		loading: 'Loading...',
+		success: 'Thank you! We connect with you soon!',
+		failure: 'Something went wrong...'
+	}
+
+	forms.forEach(item => {
+		postData(item);
+	})
+
+	function postData(form) {
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+
+			const statusMessage = document.createElement('div');
+			statusMessage.classList.add('status');
+			statusMessage.textContent = message.loading;
+			form.append(statusMessage);
+
+			const request = new XMLHttpRequest();
+			request.open('POST', './server.php');
+			request.setRequestHeader('Content-type', 'application/json');
+			const formData = new FormData(form);
+
+			const obj = {};
+
+			formData.forEach((v, k) => {
+				obj[k] = v;
+			});
+
+			request.send(JSON.stringify(obj));
+			request.addEventListener('load', () => {
+				if (request.status === 200) {
+					console.log(request.response);
+					statusMessage.textContent = message.success;
+					form.reset();
+					setTimeout(() => {
+						statusMessage.remove()
+					}, 5000)
+				} else {
+					statusMessage.textContent = message.failure;
+				}
+			})
+		})
+	}
 });
 
 
