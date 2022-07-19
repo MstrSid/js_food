@@ -80,7 +80,6 @@ window.addEventListener('DOMContentLoaded', () => {
 	// Modal
 
 	const contactBtns = document.querySelectorAll('[data-modal]');
-	const closeModalBtn = document.querySelector('[data-close]');
 	const modal = document.querySelector('.modal');
 	let isShowed = false;
 
@@ -109,15 +108,8 @@ window.addEventListener('DOMContentLoaded', () => {
 		})
 	});
 
-	closeModalBtn.addEventListener('click', (e) => {
-		if (e.target) {
-			e.preventDefault();
-			closeModal(modal);
-		}
-	});
-
 	modal.addEventListener('click', (e) => {
-		if (e.target === modal) {
+		if (e.target === modal || e.target.getAttribute('data-close') === '') {
 			closeModal(modal);
 		}
 	});
@@ -190,7 +182,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	const forms = document.querySelectorAll('form');
 
 	const message = {
-		loading: 'Loading...',
+		loading: 'icons/spinner.svg',
 		success: 'Thank you! We connect with you soon!',
 		failure: 'Something went wrong...'
 	}
@@ -203,10 +195,12 @@ window.addEventListener('DOMContentLoaded', () => {
 		form.addEventListener('submit', (e) => {
 			e.preventDefault();
 
-			const statusMessage = document.createElement('div');
-			statusMessage.classList.add('status');
-			statusMessage.textContent = message.loading;
-			form.append(statusMessage);
+			const statusMessage = document.createElement('img');
+			statusMessage.setAttribute('src', message.loading)
+			statusMessage.style.cssText = `
+			display: block;
+			margin: 0 auto;`
+			form.insertAdjacentElement("afterend", statusMessage);
 
 			const request = new XMLHttpRequest();
 			request.open('POST', './server.php');
@@ -222,17 +216,36 @@ window.addEventListener('DOMContentLoaded', () => {
 			request.send(JSON.stringify(obj));
 			request.addEventListener('load', () => {
 				if (request.status === 200) {
-					console.log(request.response);
-					statusMessage.textContent = message.success;
+					showThanksModal(message.success);
 					form.reset();
-					setTimeout(() => {
-						statusMessage.remove()
-					}, 5000)
+					statusMessage.remove();
 				} else {
-					statusMessage.textContent = message.failure;
+					showThanksModal(message.failure);
+					form.reset();
+					statusMessage.remove();
 				}
 			})
 		})
+	}
+
+	function showThanksModal(msg) {
+		const prevModal = document.querySelector('.modal__dialog');
+		prevModal.classList.add('hide');
+		const thanksModal = document.createElement('div');
+		thanksModal.classList.add('modal__dialog');
+		thanksModal.innerHTML = `
+		<div class="modal__content">
+		<div data-close class="modal__close">&times;</div>
+		<div class="modal__title">${msg}</div>		
+		</div>`;
+		document.querySelector('.modal').append(thanksModal);
+		openModal(thanksModal);
+		setTimeout(() => {
+			thanksModal.remove();
+			closeModal(document.querySelector('.modal'));
+			prevModal.classList.remove('hide');
+
+		}, 4000);
 	}
 });
 
