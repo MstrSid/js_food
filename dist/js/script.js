@@ -180,25 +180,26 @@ window.addEventListener('DOMContentLoaded', () => {
 			display: block;
 			margin: 0 auto;`;
       form.insertAdjacentElement("afterend", statusMessage);
-      const request = new XMLHttpRequest();
-      request.open('POST', './server.php');
-      request.setRequestHeader('Content-type', 'application/json');
-      const formData = new FormData(form);
       const obj = {};
+      const formData = new FormData(form);
       formData.forEach((v, k) => {
         obj[k] = v;
       });
-      request.send(JSON.stringify(obj));
-      request.addEventListener('load', () => {
-        if (request.status === 200) {
-          showThanksModal(message.success);
-          form.reset();
-          statusMessage.remove();
-        } else {
-          showThanksModal(message.failure);
-          form.reset();
-          statusMessage.remove();
-        }
+      fetch('server.php', {
+        method: "POST",
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8'
+        },
+        body: JSON.stringify(obj)
+      }).then(response => response.text()).then(data => {
+        console.log(data);
+        showThanksModal(message.success);
+        statusMessage.remove();
+      }).catch(() => {
+        showThanksModal(message.failure);
+        statusMessage.remove();
+      }).finally(() => {
+        form.reset();
       });
     });
   }
@@ -214,6 +215,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		<div class="modal__title">${msg}</div>		
 		</div>`;
     document.querySelector('.modal').append(thanksModal);
+    openModal(document.querySelector('.modal'));
     openModal(thanksModal);
     setTimeout(() => {
       thanksModal.remove();
